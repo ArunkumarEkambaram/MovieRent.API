@@ -1,7 +1,9 @@
-﻿using MovieRent.API.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using MovieRent.API.Data;
 using MovieRent.API.Data.Models;
 using MovieRent.API.Interfaces;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace MovieRent.API.Repositories
@@ -26,29 +28,51 @@ namespace MovieRent.API.Repositories
             return true;
         }
 
-        public Task<bool> DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int id)
         {
-            throw new System.NotImplementedException();
+            var movieInDb = await _context.Movies.FindAsync(id);
+            if (movieInDb == null)
+            {
+                return false;
+            }
+            _context.Movies.Remove(movieInDb);
+            await _context.SaveChangesAsync();
+            return true;
         }
 
-        public Task<IList<Movie>> GetAllAsync()
+        public async Task<IList<Movie>> GetAllAsync()
         {
-            throw new System.NotImplementedException();
+            var movies = await _context.Movies.ToListAsync();
+            return movies;
         }
 
-        public Task<Movie> GetByIdAsync(int id)
+        public async Task<Movie> GetByIdAsync(int id)
         {
-            throw new System.NotImplementedException();
+            return await _context.Movies.FindAsync(id);
         }
 
-        public Task<IList<Movie>> GetMovieByRating(int rating)
+        public async Task<IList<Movie>> GetMovieByRating(int rating)
         {
-            throw new System.NotImplementedException();
+            var movies = await _context.Movies.Where(x => x.Rating >= rating).ToListAsync();
+            return movies;
         }
 
-        public Task<bool> UpdateAsync(int id, Movie entity)
-        {
-            throw new System.NotImplementedException();
+        public async Task<bool> UpdateAsync(int id, Movie entity)
+        {           
+            var movieInDb = await _context.Movies.FindAsync(id);
+            if (movieInDb == null)
+            {
+                return false;
+            }
+
+            movieInDb.MovieName = entity.MovieName;
+            movieInDb.Rating = entity.Rating;
+            movieInDb.Genre = entity.Genre;
+            movieInDb.CoverUrl = entity.CoverUrl;
+            movieInDb.ModifiedDate = entity.ModifiedDate;
+            _context.Entry(movieInDb).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }
