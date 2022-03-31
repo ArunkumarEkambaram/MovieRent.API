@@ -43,7 +43,7 @@ namespace MovieRent.API
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)//, ILogger<Startup> logger)
         {
 
             if (env.IsDevelopment())
@@ -54,7 +54,7 @@ namespace MovieRent.API
             }
 
             //Global Exception Middleware
-            app.ConfigureUseExceptionHandler(logger);
+           // app.ConfigureUseExceptionHandler(logger);
 
             app.UseHttpsRedirection();
 

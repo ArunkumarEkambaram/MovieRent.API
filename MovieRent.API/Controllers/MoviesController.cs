@@ -25,12 +25,23 @@ namespace MovieRent.API.Controllers
         [HttpPost("AddNewMovie")]
         public async Task<IActionResult> Create([FromBody] Movie movie)
         {
-            if (movie.Id == 0)
+            try
             {
-                throw new MovieException("Movie Id cannot be zero");
+                if (movie.Id == 0)
+                {
+                    throw new MovieException("Movie Id cannot be zero");
+                }
+                await _movieRepository.CreateAsync(movie);
+                return Ok(movie);
             }
-            await _movieRepository.CreateAsync(movie);
-            return Ok(movie);
+            catch (Exception ex) // when (ex.GetType()==typeof(MovieException))
+            {             
+                if (ex.GetType() == typeof(MovieException))
+                {
+                    _logger.LogError(ex.Message);                   
+                }
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpGet("GetAllMovies")]
@@ -38,7 +49,7 @@ namespace MovieRent.API.Controllers
         {
             try
             {
-                throw new MovieException("Unable to fetching movie details");
+                //throw new MovieException("Unable to fetching movie details");
                 _logger.LogInformation("Fetching Movie Details");
                 var movies = await _movieRepository.GetAllAsync();
                 _logger.LogInformation($"Total items fetched :{movies.Count}");
