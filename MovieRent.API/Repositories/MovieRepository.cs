@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MovieRent.API.CustomExceptions;
 using MovieRent.API.Data;
 using MovieRent.API.Data.Models;
 using MovieRent.API.Interfaces;
@@ -19,9 +20,14 @@ namespace MovieRent.API.Repositories
 
         public async Task<bool> CreateAsync(Movie entity)
         {
-            if (entity == null)
+            if (entity.Id == 0)
             {
-                return false;
+                throw new MovieException("Movie id cannot be zero");
+            }
+
+            if(string.IsNullOrWhiteSpace(entity.MovieName))
+            {
+                throw new MovieException("Movie Name cannot be blank");
             }
             _context.Movies.Add(entity);
             await _context.SaveChangesAsync();
@@ -58,7 +64,7 @@ namespace MovieRent.API.Repositories
         }
 
         public async Task<bool> UpdateAsync(int id, Movie entity)
-        {           
+        {
             var movieInDb = await _context.Movies.FindAsync(id);
             if (movieInDb == null)
             {

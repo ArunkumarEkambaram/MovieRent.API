@@ -40,6 +40,7 @@ namespace MovieRent.API.Controllers
                 {
                     _logger.LogError(ex.Message);                   
                 }
+                _logger.LogError(ex.Message);
                 return StatusCode(500, ex.Message);
             }
         }
